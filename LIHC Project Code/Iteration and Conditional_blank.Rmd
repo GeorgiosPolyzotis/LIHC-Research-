@@ -1,0 +1,164 @@
+---
+title: "Iteration and Conditional"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Iterations
+Prompt: Let's say I want to type the statement "My favorite number is 1" with 100 different numbers. How do I do this? 
+
+First let's try printing the statement manually: 
+```{r}
+
+```
+
+I don't know about you, but I'm starting to get a bit bored of copying, pasting and changing the number...let's see if we can utalize the for loop
+
+```{r}
+for(i in 1:100){
+  print(i)
+}
+```
+
+The first part dictates how many times the loop run for. The variable i starts with a value of 1 and will increase it's value after it finishes the loop.
+
+i is like a temporary variable; it disappears after the for loop is done running
+
+Let's apply this to our printing problem: 
+```{r}
+poop = vector()
+
+for(i in 1:10){
+  poop = c(poop,i)
+}
+print(poop)
+```
+
+(SHOW SLIDE 8)
+
+### Conditional
+What if I only like even numbers? How can I reprogram the earlier program so only even numbers print? 
+```{r}
+for(i in 1:100){
+  if(i%%2==0){
+    poop = c(poop,i)
+  }
+  else{
+    poop=c(poop,1)
+  }
+}
+print(poop)
+```
+
+
+(I'm GOING TO BE DOING LOTS OF TYPING -- PLEASE TRY TO FOLLOW ALONG THE LOGIC!)
+(DO not copy this example)
+Example #2, let's make a vector that creates a vector of headers that go like GroupA_1, GroupB_1, GroupA_2, GroupB_2...GroupA_10, GroupB_10
+```{r}
+
+```
+
+
+(DO not copy this example)
+Two problems: We want to start with GroupA and we need to get rid of the 0.5
+Let's fix the starting with GroupA instead of GroupB problem first
+
+```{r}
+
+```
+
+
+
+(FINAL ANSWER)
+Wait, we forgot to change the index numbers when we do the Headers[i] function lol
+Also, Group B is 0.5 greater than what is supposed to be
+
+```{r}
+
+```
+
+Great we did it! 
+
+EXAMPLE 3: Let's make a vector containing the pvalues from the ttests of smalldata tumors vs. controls: 
+```{r}
+#Show how code works for one instance
+#Add a for loop here: 
+```
+```{r}
+
+```
+
+
+
+### Breakout Room Task
+Your turn: 
+Go to your Group!
+Using small data
+1. Change the smalldata to a matrix.
+```{r}
+smalldataM = as.matrix(smalldata)
+```
+
+2. Make an empty data.frame named ttest.
+```{r}
+ttest = data.frame()
+
+```
+
+3. For the first gene (hint: first row) 
+      1. calculate t.test p-value between expression values all tumor samples (hint: first 10 samples and the 
+         values need to be numeric) and all control samples (change from your earlier task)
+```{r}
+h = smalldataM[1,grep("Control",colnames(smalldataM))]
+t = smalldataM[1,grep("Tumor",colnames(smalldataM))]
+p.value = t.test(h,t)$p.value
+p.value
+```
+         
+      2. If p-value is less than 0.0001, add to the expression values in the ttest (hintt: use rbind 
+         function).
+4. Do the step 3 for the remaining genes (total 19) using a for loop
+```{r}
+
+
+
+for(i in 1:20){
+  h = smalldataM[i,grep("Control",colnames(smalldata))]
+  t = smalldataM[i,grep("Tumor",colnames(smalldata))]
+  p.value = t.test(h,t)$p.value
+ 
+  if(p.value < 0.0001){
+    
+    ttest = rbind(ttest,smalldata[i,])
+    
+   
+  }
+  
+
+}
+
+
+```
+
+5. Add a column that checks the ratio between means for the tumors and control (tumor_mean/control_mean) (to the ttest dataframe)
+```{r}
+summary = data.frame()
+
+for(k in 1:nrow(ttest)){
+```
+
+
+```{r}
+tMean = mean(t(ttest[k,grep("Tumor",colnames(ttest))]))
+  
+}
+```
+
+6. Create a new data frame called updata. Add the data for all the miRs where the tumor mean is HIGHER than the control mean among miR with p<0.0001.
+```{r}
+
+```
+

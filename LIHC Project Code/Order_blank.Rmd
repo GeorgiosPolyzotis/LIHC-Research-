@@ -1,0 +1,64 @@
+---
+title: "Order_blank"
+output: html_document
+author: "Divya"
+date: "2024-07-11"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+### Basic Order example: 
+
+```{r}
+vec = sample(1:100,50,replace = TRUE)
+vec
+vec[order(vec,decreasing = TRUE)]
+
+```
+
+
+### Harder Example: How can you sort smalldata based on p-value? 
+```{r}
+
+```
+
+let's see how smalldata looks like: 
+```{r}
+
+```
+
+find add a col of p-values
+```{r}
+
+```
+
+```{r}
+
+```
+
+We have: 
+smalldata with pvalues 
+and a vector of pvalues
+
+Now lets use the order function: 
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+Shortcut: 
+```{r}
+
+```
+
+
+
+

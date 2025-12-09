@@ -1,0 +1,175 @@
+---
+title: "glmbasic"
+author: "Marianne Cowherd orginal, Inhan Lee edited"
+date: "2024-07-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Read smalldata
+
+First row: header, first column: row.name
+
+```{r}
+smalldata = read.table("small_data.txt", header = T, stringsAsFactors = F, row.names = 1)
+```
+
+let's take a look: 
+```{r}
+head(smalldata)
+str(smalldata)
+```
+
+## Use two genes to train and predict tumor vs normal samples
+
+### only comparing first gene (miR_a) with last gene (miR_t)
+
+```{r}
+smalldata_cut = rbind(smalldata["miR_a",],smalldata["miR_t",])
+```
+
+### make the genes the columns of a data frame
+```{r}
+genedata = as.data.frame(t(smalldata_cut))
+genedata
+
+```
+
+### add in response variable column for training Tumor (1) vs Control (0)
+
+```{r}
+genedata$response[grep("Tumor",rownames(genedata))] = 1
+genedata$response[grep("Control",rownames(genedata))] = 0
+```
+
+
+### lets look what this did
+```{r}
+#View(smalldata_cut)
+#View(genedata)
+
+```
+
+
+## plotting the two gene expressions (miR_a, miR_t) of 20 samples
+
+```{r}
+plot(genedata[,"miR_a"],genedata[,"miR_t"])
+```
+
+### coloring Tumor vs Control differently
+```{r}
+# Plot
+plot(genedata[,"miR_a"],genedata[,"miR_t"], col = ifelse(genedata$response == 1,"red","blue"))
+# Add a legend
+```
+
+
+## Make a GLM model using the training data
+```{r}
+model <- glm(response ~ ., family=binomial(link='logit'), data = genedata)
+options(scipen = 10)
+summary(model)
+slope <- coef(model)[2]/(-coef(model)[3])
+intercept <- coef(model)[1]/(-coef(model)[3])
+
+# Plot
+plot(genedata[,"miR_a"],genedata[,"miR_t"], col = ifelse(genedata$response == 1,"red","blue"), pch =16)
+# Legend
+legend("topright", col = c("red","blue"),c("Tumor","Control"), pch =16)
+abline(intercept,slope) # Put in classification line
+```
+
+
+## Predicting three new patients whose miR_a and miR_t values we know
+
+1) Make a data frame of three patients' miR_a and miR_t values
+```{r}
+miR_a <- c(50125,240101,160009)
+miR_t <- c(412,209,1100)
+
+# Extract the columns here
+
+# Make new column with patient response
+```
+
+
+2) adding new patients to our data frame
+```{r}
+
+```
+
+3) plotting with new patient for our understanding the data (not glm process)
+```{r}
+# Plot
+
+# Add a legend
+
+# Put in classification line from the model using training data
+```
+
+4) predicting new patients (glm process)
+```{r}
+predict.glm(model, newdata = newPatients)
+```
+
+
+
+# Higher dimensions? Extra credit: On your own
+
+## Three miR data to model tumor vs control samples (miR_a, miR_t, miR_c)
+# Tumor = 1, Control = 0
+```{r}
+
+
+```
+
+## View in 3D plot
+
+#install.packages("scatterplot3d")
+```{r}
+#install.packages("scatterplot3d")
+#library(scatterplot3d)
+
+# Make scatterplot
+```
+
+
+## Build a model using training data
+
+```{r}
+model <- glm(response ~ ., family=binomial(link='logit'), data = genedata3d)
+summary(model)
+```
+
+## Predicting a new patient
+
+```{r}
+miR_a <- c(50125,240101,160009)
+miR_t <- c(412,209,1100)
+miR_c <- c(2500,8400,15000)
+
+# Extract the columns here
+
+# Make new column with patient response
+```
+
+## adding new patients to our data frame to view all samples in a 3d plot (not glm process)
+
+```{r}
+# New data frame with 3 miRNAs
+
+scatterplot3d() # Plot
+
+# Legend
+```
+
+## predicting new patients using glm model
+
+```{r}
+predict.glm(model, newdata = newgenedata)
+```
+

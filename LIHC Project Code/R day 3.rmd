@@ -1,0 +1,40 @@
+---
+title: "miRcore R session day 3 quiz."
+output: html_document
+date: "2025-08-06"
+---
+```{r}
+barplot(sample(20:50,6,replace=F), main = "flavor vs. number of fans", ylab = "number of fans", xlab = "ice cream flavor", names.arg = c("chocolate", "vanilla", "strawberry", "butter pecan", "pistachio","black cherry."), col = c("brown", "white", "pink","yellow","green","purple"), legend.text = T, args.legend = c("chocolate","vannilla","strawberry","butter pecan","pistachio","black cherry"))
+```
+
+
+```{r}
+smalldata = read.table("small_data.txt", header = T, row.names = 1, stringsAsFactors = F)
+t5 = smalldata[,"Tumor_5"]
+c5 = smalldata[,"Control_5"]
+plot(t5,c5, main = "t5 vs c5", col = "blue", ylab = "c5 expression", xlab = "t5 expression")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

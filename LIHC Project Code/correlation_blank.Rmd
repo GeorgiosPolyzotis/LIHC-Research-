@@ -1,0 +1,142 @@
+---
+title: "Graphs_Blank"
+output: html_document
+author: "Anna Kaehr"
+date: 'July 2023'
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Today we will learn about how to make graphs to visually represent our data in a meaningful way
+
+# miRcore R camp day 3-3
+
+# Read in small data.txt again
+```{r}
+
+```
+
+# Convert to matrix
+```{r}
+
+```
+
+
+## scatter plot
+A scatter graph plots paired values. Here we'll use the function plot(x,y) where x and y are vectors.
+
+```{r}
+x = c(5.1,4.9,4.7,4.6,5.0,5.4)
+y = c(3.1,3.2,2.9,3.0,3.6,3.3)
+plot(x,y)
+```
+```{r}
+
+```
+We can set the x and y limits of the plots using: xlim() and ylim()
+```{r}
+
+```
+You can find a variety of other graphic parameters such as line width and line type at this resource:
+http://www.statmethods.net/advgraphs/parameters.html
+lwd: line width
+lty: line type
+
+
+Task 2: Breakout Rooms!
+
+Make a scatter plot of miR_h values between each patient’s tumor and control samples (tumor values on x-axis and control values on y-axis).
+
+
+*If you don’t want scientific notation, give a penalty to it.
+options(scipen=5)  # positive number prefers fixed value, negative number prefers scientific notation.
+
+
+answer:
+
+```{r}
+vth = smalldataM["miR_h",grep("Tumor",colnames(smalldata))]
+vch = smalldataM["miR_h",grep("Control",colnames(smalldata))]
+plot(vth,vch)
+
+
+```
+
+
+We can use scatter plots to compare the expression values for different miRs. Lets look at miR_a plotted against miR_t
+```{r}
+a = smalldataM["miR_a",]
+t = smalldataM["miR_t",]
+plot(a,t)
+
+```
+
+```{r}
+
+```
+Quick break: 15 minutes
+
+
+
+## correlation
+
+See slides.
+
+Correlation is a mutual relationship between two or more things. In statistics, you can think of correlation as a measure of how strongly two or more things are related.
+Two variables with very high correllation will behave very similarly moving together.
+Variables with correlation close to zero will not move together.
+
+
+Two variables are said to be positively correlated if an increase in one is associated with an increase in the other
+Two variables are said to be negatively correlated if an increase in one is associated with a decrease in the other
+
+Shoe size and length of foot are very highly positively correlated: an increase in foot length will very strongly be associated with a larger shoe size
+
+SAT score and GPA are somewhat positively correlated: People with higher GPA tend to score higher on the SAT, but not always
+
+Shoe size and SAT score are uncorrelated (correlation close to zero): Think, do people with larger feet tend to do better/worse on the SAT?No, they tend to perform the same as people with small feet
+
+
+Shoe size and length of foot are very highly positively correlated: an increase in foot length will very strongly be associated with a larger shoe size
+
+SAT score and GPA are somewhat positively correlated: People with higher GPA tend to score higher on the SAT, but not always
+
+Shoe size and SAT score are uncorrelated (correlation close to zero): Think, do people with larger feet tend to do better/worse on the SAT?No, they tend to perform the same as people with small feet
+
+cor(x,y) calculates the correlation between the two vectors x and y
+Values close to 1 or -1 imply strong correlation
+Values close to 0 indicate little to no correlation
+
+
+```{r}
+
+
+```
+Correlation does not imply causation!!
+
+Example from wikipedia:Ice cream sales and the rate of drowning are positively correlated, but clearly ice cream consumption does not cause drowning.
+
+The aforementioned example fails to recognize the importance of time and temperature in relationship to ice cream sales. Ice cream is sold during the hot summer months at a much greater rate than during colder times, and it is during these hot summer months that people are more likely to engage in activities involving water, such as swimming. The increased drowning deaths are simply caused by more exposure to water-based activities, not ice cream. 
+These two variables are correlated, but do not cause each other
+
+
+### Task using small_data.txt
+
+Make vectors for each item
+
+Make a scatter plot between miR_a and miR_c for all samples.
+Make a scatter plot between miR_a and miR_k for all samples.
+What is the correlated value between miR_a and miR_c?
+What is the correlated value between miR_a and miR_k?
+
+Answers:
+
+```{r}
+
+
+```
+
+

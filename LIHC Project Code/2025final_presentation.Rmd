@@ -1,0 +1,308 @@
+---
+title: "miRcore R camp TCGA Group Task"
+author: "[Group Name Here]"
+date: "August 8, 2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+```
+
+# miRcore summer camp 2025
+© miRcore
+
+
+## Disease Information
+
+What is the significance ((background and problems) of the disease you are analyzing?
+
+
+
+## Reading in Data
+
+Read in the cancer miRNA expression text file that you downloaded from the Google Drive
+
+```{r}
+LIHC = read.table("LIHC.txt", header = T, row.names = 1, stringsAsFactors = F)
+
+```
+
+
+A. What are the dimensions of your text file? 915 x 98
+
+```{r}
+dim(LIHC)
+```
+
+B. How many Tumor and Control samples are in your dataset? 49 and 49
+
+```{r}
+grep("Control", colnames(LIHC))
+colnames(LIHC)
+
+```
+
+
+## Plotting
+
+A1. Make box plots for first 10 Tumor samples and first 10 Control samples using all data.
+
+```{r}
+
+boxplot(LIHC[,c(1:10,50:60)])
+```
+
+A2. Make box plots for first 10 Tumor samples and first 10 Control samples using log2(data+1).
+
+```{r}
+LIHCM = as.matrix(LIHC)
+log.LIHCM = log2(LIHCM+1)
+boxplot(log.LIHCM[,c(1:10,50:60)])
+```
+
+
+B. Make a scatterplot for hsa-miR-200a-3p and hsa-miR-429 using all
+samples in your data file. Then compute the Pearson correlation.
+
+```{r}
+LIHCM = as.matrix(LIHC)
+plot(LIHCM["hsa-miR-200a-3p",],LIHCM["hsa-miR-429",])
+cor(LIHCM["hsa-miR-200a-3p",],LIHCM["hsa-miR-429",])
+
+```
+
+
+## T Tests
+
+A. For each miRNA: calculate mean, standard deviation, and the 2-tail student t-test p-value of Tumor and Control groups. Save all results in a table.
+
+```{r}
+ttable = data.frame()
+control = grep("Control",colnames(LIHCM))
+tumor = grep("Tumor",colnames(LIHCM))
+for(j in 1:nrow(LIHCM)){
+  
+  meanControl =  mean(LIHCM[j,control])
+  meanTumor = mean(LIHCM[j,tumor])
+  sdControl = sd(LIHCM[j,control])
+  sdTumor = sd(LIHCM[j,tumor])
+  pval = t.test(LIHCM[j,tumor],LIHCM[j,control])$p.value
+  temp = c(meanControl,meanTumor,sdControl,sdTumor,pval)
+  ttable = rbind(ttable,temp)
+}
+colnames(ttable) = c("Control Mean", "Tumor Mean", "Control SD", "Tumor SD", "P-val")
+row.names(ttable) = row.names(LIHC)
+
+
+
+
+```
+
+
+B.  Find 50 most significantly different miRNA names between tumor and control samples and save their names with means, standard deviations for tumor and control samples and p-values.
+```{r}
+sigvals = ttable[,"P-val"]
+sigvec = order(sigvals)
+sigvec = sigvec[1:50]
+sigtable = ttable[sigvec,]
+sigMIRNAS = rownames(sigtable)
+
+sigtable
+sigMIRNAS
+```
+```{r}
+temptable = ttable[!is.nan(ttable[,"P-val"]),]
+  for(l in 2:nrow(temptable)){
+     for(z in (l-1):1){
+       
+        if(temptable[z,"P-val"] > temptable[z+1,"P-val"]){
+          temp <- temptable[z,]
+          temptable[z,] <- temptable[z+1,]
+          temptable[z+1,] <- temp
+      }
+      
+    }
+  }
+head(temptable)
+
+
+```
+
+```{r}
+
+pvec = vector()
+for(k in 1:nrow(ttable)){
+  pvec = c(pvec, ttable[k,"P-val"])
+  currentval = pvec[k]
+  for(p in 1:length(pvec)){
+    if(!is.na(pvec[p]) & !is.na(currentval) & pvec[p] > currentval){
+      for(m in p:length(pvec)){
+        temp = pvec[m]
+        pvec[m] = currentval
+        currentval = temp
+      }
+      
+    }
+  }
+}
+pvec[1:50]
+
+```
+
+
+C. Make a heatmap of 50 most signficantly differently expressed miRNAs (row clustering only). Use the colors darkblue,
+white and red2. [USA!USA!USA!].
+
+```{r}
+install.packages("pheatmap")
+library(pheatmap)
+
+sigtable_LIHC <- log2(LIHC[sigMIRNAS,] +1)
+sigtable_LIHC
+pheatmap(sigtable_LIHC, scale = "row",clustering_distance_rows = "correlation", cellwidth = 15, cellheight = 10, color = colorRampPalette(c("darkblue", "white","red"))(256), border_color = NA, main = "Heatmap of top 50 sig Expressed",width = 100, height = 100)
+
+```
+
+## Correlations
+
+A. Find correlations between the most significant miRNA with 29 other miRNAs for 1) all samples.
+
+
+B. Among A. can you find some patterns between miRNAs? What are your findings? (example: to find the most correlated miRNA with the most significant miRNA)
+
+
+## Random Forest (Bonus)
+
+A. Create a random forest using the steps from the random forest .html file to classify your data. What is your accuracy?
+```{r}
+
+
+LIHC_data = read.table("LIHC.txt", header=T, row.names=1, stringsAsFactors=F)
+head(LIHC_data)
+dim(LIHC_data)
+
+sig_miRs <- vector()
+
+num_samples <- length(LIHC_data) # columns (172)
+num_miRNAs <- nrow(LIHC_data) # rows (941)
+
+tumor_samples <- 1:49 # 1:(num_samples/2) # 1:86
+control_samples <- 50:98 # ((num_samples/2)+1):(num_samples) # 87:172
+
+for(i in 1:num_miRNAs){
+  tumor_vector <- LIHC_data[i,tumor_samples]
+  control_vector <- LIHC_data[i,control_samples]
+  
+  p_value <- t.test(tumor_vector,control_vector)$p.value
+  
+  if(!is.na(p_value) && p_value < 0.001){
+    sig_miRs <- c(sig_miRs,i)
+  }
+}
+
+sig_miRs[1:10] # 4  6  8  9 10 11 16 17 18 22
+length(sig_miRs)
+
+
+LIHC_data_cleaned = LIHC_data[rowSums(LIHC_data > 0) > 86, ]
+dim(LIHC_data_cleaned)
+
+
+pval=vector()
+for (i in 1:nrow(LIHC_data_cleaned)) {
+  p_value = t.test(LIHC_data_cleaned[i,1:49],LIHC_data_cleaned[i,50:98])$p.value
+  pval=c(pval,p_value)
+}
+
+top50 = order(pval)[1:50]
+LIHC_top50 = LIHC_data_cleaned[top50,]
+
+LIHC_data_sig = LIHC_data[sig_miRs,]
+
+dim(LIHC_data_sig)
+
+tLIHC_data_sig = t(LIHC_data_sig)
+
+Condition = rownames(tLIHC_data_sig)
+Condition[1:10]
+
+for(i in 1:length(Condition)){
+  if (grepl("Tumor", Condition[i], fixed = TRUE) == TRUE) {
+     Condition[i] = "Tumor"
+  } else{
+     Condition[i] = "Control"
+  }
+}
+
+Condition = as.factor(Condition)
+tLIHC_data_sig = cbind.data.frame(Condition, tLIHC_data_sig)
+tLIHC_data_sig[1:10,1:15]
+
+set.seed(123)
+num_row = length(Condition)
+train_sample = sample(1:num_row, round(0.7*num_row), replace = FALSE)
+
+colnames(tLIHC_data_sig) = gsub("-", ".", colnames(tLIHC_data_sig))
+train_data = tLIHC_data_sig[train_sample,]
+
+test_data = tLIHC_data_sig[-train_sample, ]
+
+dim(train_data)
+dim(test_data)
+dim(tLIHC_data_sig)
+
+LIHC_forest = randomForest(Condition ~ ., 
+                           ntree = 100, 
+                           data = train_data)
+importance(LIHC_forest)[order(importance(LIHC_forest)),]
+varImpPlot(LIHC_forest)
+
+train_predictions = predict(LIHC_forest, train_data)
+table(train_predictions, train_data$Condition)
+
+test_predictions = predict(LIHC_forest, test_data)
+table(test_predictions,test_data$Condition)
+confusion_matrix = table(test_predictions, test_data$Condition)
+
+# Calculate accuracy
+accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+cat("Model Accuracy: ", accuracy, "\n")
+```
+
+
+B. Change variables in the random forest run and check if the results are different. What are the parameters that you can achieve a better accuracy?
+
+
+## Analysis
+
+### miRNAs
+
+What are your most significant miRNAs? Are they up-regulated or down-regulated? Are they highly correlated with each other?
+
+
+### Genes
+
+A. What are the common gene targets of your significant miRNAs?
+
+
+B. Are any of your genes targeted by these top miRNAs known mutations of the disease you are researching?
+
+
+## Conclusion
+
+What do your findings suggest to you about potential diagnosis/treatment targets for the disease you are researching?
+
+
+
+## Optional
+
+
+A. Make a heatmap of all data (row clustering only). Use the colors darkblue, white and red2. [USA!USA!USA!].
+
+
+B. find all correlations among the 30 most significant miRNAs for
+1) all samples, 2) all tumor samples, 3) all control samples.
